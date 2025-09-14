@@ -1,1 +1,1 @@
-from models import User, Restaurant, Booking
+from models import user, restaurant, booking
