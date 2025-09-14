@@ -9,7 +9,9 @@ from functools import wraps
 
 # Import database and models
 from db import db
-from models import User, Restaurant, Booking
+from models.User import User       # match the filename exactly
+from models.Restaurant import Restaurant
+from models.Booking import Booking
 
 def create_app():
     app = Flask(__name__)
