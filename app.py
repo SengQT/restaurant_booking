@@ -16,28 +16,19 @@ from models.Booking import Booking
 def create_app():
     app = Flask(__name__)
     
-    # Load environment variables
-    from dotenv import load_dotenv
-    load_dotenv()
-    
+    # Config
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    # File upload configuration
     app.config['UPLOAD_FOLDER'] = 'static/uploads'
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-    
-    # Ensure upload directory exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     
-    # Initialize database
+    # Initialize db
     db.init_app(app)
     
-    # Create tables
     with app.app_context():
         db.create_all()
-        # Create default admin user if doesn't exist
+        # Create default admin if not exists
         admin = User.query.filter_by(email='admin@restaurant.com').first()
         if not admin:
             admin_user = User(
@@ -48,7 +39,6 @@ def create_app():
             )
             db.session.add(admin_user)
             db.session.commit()
-            print("Default admin user created: admin@restaurant.com / admin123")
     
     # Helper function to check allowed file extensions
     def allowed_file(filename):
