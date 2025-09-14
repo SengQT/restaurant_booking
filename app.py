@@ -10,7 +10,7 @@ from flask_moment import Moment
 
 # Import database and models
 from db import db
-from models.user import User
+from models.user import user
 from models.restaurant import Restaurant  
 from models.booking import Booking
 
@@ -39,9 +39,9 @@ def create_app():
     with app.app_context():
         db.create_all()
         # Create default admin user if doesn't exist
-        admin = User.query.filter_by(email='admin@restaurant.com').first()
+        admin = user.query.filter_by(email='admin@restaurant.com').first()
         if not admin:
-            admin_user = User(
+            admin_user = user(
                 email='admin@restaurant.com',
                 username='admin',
                 password=generate_password_hash('admin123'),
@@ -70,7 +70,7 @@ def create_app():
         def decorated_function(*args, **kwargs):
             if 'user_id' not in session:
                 return redirect(url_for('login'))
-            user = User.query.get(session['user_id'])
+            user = user.query.get(session['user_id'])
             if not user or user.role not in ['admin', 'manager']:
                 flash('Access denied. Admin or Manager privileges required.', 'error')
                 return redirect(url_for('index'))
@@ -89,7 +89,7 @@ def create_app():
             email = request.form['email']
             password = request.form['password']
             
-            user = User.query.filter_by(email=email).first()
+            user = user.query.filter_by(email=email).first()
             
             if user and check_password_hash(user.password, password):
                 session['user_id'] = user.id
@@ -113,15 +113,15 @@ def create_app():
             username = request.form['username']
             password = request.form['password']
             
-            if User.query.filter_by(email=email).first():
+            if user.query.filter_by(email=email).first():
                 flash('Email already registered', 'error')
                 return render_template('register.html')
             
-            if User.query.filter_by(username=username).first():
+            if user.query.filter_by(username=username).first():
                 flash('Username already taken', 'error')
                 return render_template('register.html')
             
-            user = User(
+            user = user(
                 email=email,
                 username=username,
                 password=generate_password_hash(password),
@@ -144,7 +144,7 @@ def create_app():
     @app.route('/user/dashboard')
     @login_required
     def user_dashboard():
-        user = User.query.get(session['user_id'])
+        user = user.query.get(session['user_id'])
         if user is None:
             # Invalid session (e.g., user deleted); clear session and redirect to login
             session.clear()
@@ -187,7 +187,7 @@ def create_app():
     def admin_dashboard():
         restaurants = Restaurant.query.all()
         bookings = Booking.query.order_by(Booking.created_at.desc()).all()
-        users = User.query.all()
+        users = user.query.all()
         return render_template('admin/dashboard.html', 
                              restaurants=restaurants, 
                              bookings=bookings, 
