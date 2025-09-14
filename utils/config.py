@@ -1,36 +1,11 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from utils.config import Config
+import os
+from dotenv import load_dotenv
 
-# Initialize extensions
-db = SQLAlchemy()
-migrate = Migrate()
+load_dotenv()
 
-def create_app():
-    app = Flask(__name__)
-    app.config.from_object(Config)
-    
-    # Initialize extensions with app
-    db.init_app(app)
-    migrate.init_app(app, db)
-    
-    # Import models (must be after db initialization)
-    from models import user, booking, restaurant
-    
-    # Register blueprints
-    from routes.user import user_bp
-    from routes.admin import admin_bp
-    from routes.manager import manager_bp
-    
-    app.register_blueprint(user_bp, url_prefix='/')
-    app.register_blueprint(admin_bp, url_prefix='/admin')
-    app.register_blueprint(manager_bp, url_prefix='/manager')
-    
-    return app
-
-# Create app instance
-app = create_app()
-
-if __name__ == '__main__':
-    app.run(debug=True)
+class Config:
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    UPLOAD_FOLDER = 'static/uploads'
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ restaurant.name }} - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-edit"></i> Edit Restaurant</h2>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Restaurant Name</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ restaurant.name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location</label>
+                                <input type="text" class="form-control" id="location" name="location" 
+                                       value="{{ restaurant.location }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4">{{ restaurant.description or '' }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       value="{{ restaurant.phone or '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ restaurant.email or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="capacity" class="form-label">Capacity</label>
+                                <input type="number" class="form-control" id="capacity" name="capacity" 
+                                       min="1" value="{{ restaurant.capacity }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Restaurant Image</label>
+                                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                <small class="form-text text-muted">Leave empty to keep current image</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Update Restaurant</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-image"></i> Current Image</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if restaurant.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + restaurant.image) }}" 
+                         class="img-fluid rounded" alt="{{ restaurant.name }}">
+                {% else %}
+                    <div class="bg-light p-4 rounded">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                        <p class="mt-2 text-muted">No image uploaded</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> Statistics</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Total Bookings:</strong> {{ restaurant.bookings|length }}</p>
+                <p><strong>Pending:</strong> {{ restaurant.bookings|selectattr('status', 'equalto', 'pending')|list|length }}</p>
+                <p><strong>Confirmed:</strong> {{ restaurant.bookings|selectattr('status', 'equalto', 'confirmed')|list|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

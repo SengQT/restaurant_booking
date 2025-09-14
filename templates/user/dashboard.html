@@ -1,0 +1,78 @@
+<!-- templates/user/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - Restaurant Booking{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-calendar-alt"></i> My Dashboard</h2>
+    <div>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Make New Booking
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> My Bookings</h5>
+            </div>
+            <div class="card-body">
+                {% if bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Restaurant</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Guests</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                    <tr>
+                                        <td>{{ booking.restaurant.name }}</td>
+                                        <td>{{ booking.booking_date.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ booking.booking_time.strftime('%H:%M') }}</td>
+                                        <td>{{ booking.guests }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                                {{ booking.status.title() }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h5>No bookings yet</h5>
+                        <p class="text-muted">Start by booking your first restaurant!</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">Browse Restaurants</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-user"></i> Profile</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Member since:</strong> {{ user.created_at.strftime('%B %Y') }}</p>
+                <p><strong>Total Bookings:</strong> {{ bookings|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

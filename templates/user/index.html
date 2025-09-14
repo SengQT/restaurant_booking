@@ -1,370 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Saveur Restaurant</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: 'Georgia', serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f9f7f4 0%, #e8e3d8 100%);
-            min-height: 100vh;
-        }
+{% block title %}Home - Restaurant Booking{% endblock %}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            animation: fadeInUp 0.8s ease-out;
-        }
+{% block content %}
+<div class="hero-section text-center py-5 mb-5 bg-primary text-white rounded">
+    <h1><i class="fas fa-utensils"></i> Welcome to Restaurant Booking</h1>
+    <p class="lead">Discover and book amazing restaurants in your area</p>
+    {% if not session.user_id %}
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-2">Get Started</a>
+        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">Login</a>
+    {% endif %}
+</div>
 
-        header {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: linear-gradient(135deg, rgba(44, 24, 16, 0.95), rgba(139, 69, 19, 0.9));
-            border-radius: 20px;
-            color: white;
-            margin-bottom: 3rem;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
+<h2 class="mb-4">Featured Restaurants</h2>
 
-        header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        header h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            letter-spacing: 2px;
-            font-weight: 300;
-            position: relative;
-            z-index: 2;
-        }
-
-        header p {
-            font-size: 1.3rem;
-            opacity: 0.9;
-            font-style: italic;
-            position: relative;
-            z-index: 2;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin: 3rem 0;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 1.2rem 2.5rem;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            font-size: 0.9rem;
-        }
-
-        .btn:nth-child(1) {
-            background: linear-gradient(45deg, #d4af37, #f4e76e);
-            color: #2c1810;
-        }
-
-        .btn:nth-child(1):hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(212, 175, 55, 0.4);
-            background: linear-gradient(45deg, #f4e76e, #d4af37);
-        }
-
-        .btn:nth-child(2) {
-            background: linear-gradient(45deg, #8B4513, #A0522D);
-            color: white;
-        }
-
-        .btn:nth-child(2):hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(139, 69, 19, 0.4);
-            background: linear-gradient(45deg, #A0522D, #8B4513);
-        }
-
-        .btn:nth-child(3) {
-            background: transparent;
-            color: #2c1810;
-            border: 2px solid #d4af37;
-        }
-
-        .btn:nth-child(3):hover {
-            background: #d4af37;
-            color: #2c1810;
-            transform: translateY(-3px);
-        }
-
-        .about {
-            background: white;
-            padding: 3rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center;
-            margin-top: 2rem;
-            position: relative;
-        }
-
-        .about::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(45deg, #d4af37, #f4e76e);
-            border-radius: 15px 15px 0 0;
-        }
-
-        .about h2 {
-            font-size: 2.5rem;
-            color: #2c1810;
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .about h2::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: #d4af37;
-        }
-
-        .about p {
-            font-size: 1.1rem;
-            color: #555;
-            line-height: 1.8;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        /* Quick Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-
-        .stat-card {
-            background: rgba(255,255,255,0.9);
-            padding: 2rem;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #d4af37;
-            display: block;
-        }
-
-        .stat-label {
-            color: #555;
-            margin-top: 0.5rem;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2.5rem;
-            }
-            
-            nav {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 80%;
-                max-width: 300px;
-                text-align: center;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .about {
-                padding: 2rem 1.5rem;
-            }
-        }
-
-        /* Special effects */
-        .sparkle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #d4af37;
-            border-radius: 50%;
-            animation: sparkle 2s ease-in-out infinite;
-        }
-
-        @keyframes sparkle {
-            0%, 100% { opacity: 0; transform: scale(0); }
-            50% { opacity: 1; transform: scale(1); }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <div class="sparkle" style="top: 20%; left: 15%; animation-delay: 0s;"></div>
-            <div class="sparkle" style="top: 70%; right: 20%; animation-delay: 0.7s;"></div>
-            <div class="sparkle" style="top: 40%; right: 15%; animation-delay: 1.4s;"></div>
-            <h1>Welcome to Saveur Restaurant</h1>
-            <p>Experience fine dining with us. Reserve your table today and embark on a culinary journey!</p>
-        </header>
-
-        <nav>
-            <a href="../booking/booking.html" class="btn">Book a Table</a>
-            <a href="/menu" class="btn">View Menu</a>
-            <a href="/contact" class="btn">Contact Us</a>
-        </nav>
-
-        <div class="stats">
-            <div class="stat-card">
-                <span class="stat-number">15+</span>
-                <div class="stat-label">Years Experience</div>
+{% if restaurants %}
+    <div class="row">
+        {% for restaurant in restaurants %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    {% if restaurant.image %}
+                        <img src="{{ url_for('static', filename='uploads/' + restaurant.image) }}" 
+                             class="card-img-top" alt="{{ restaurant.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 200px;">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ restaurant.name }}</h5>
+                        <p class="card-text">{{ restaurant.description[:100] if restaurant.description else '' }}{% if restaurant.description and restaurant.description|length > 100 %}...{% endif %}</p>
+                        <div class="mt-auto">
+                            <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ restaurant.location }}</p>
+                            <p class="mb-1"><i class="fas fa-phone"></i> {{ restaurant.phone or 'N/A' }}</p>
+                            <p class="mb-3"><i class="fas fa-users"></i> Capacity: {{ restaurant.capacity }}</p>
+                            {% if session.user_id and session.role == 'user' %}
+                                <a href="{{ url_for('book_restaurant', restaurant_id=restaurant.id) }}" 
+                                   class="btn btn-primary">Book Now</a>
+                            {% elif not session.user_id %}
+                                <a href="{{ url_for('login') }}" class="btn btn-outline-primary">Login to Book</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <span class="stat-number">5★</span>
-                <div class="stat-label">Customer Rating</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">50+</span>
-                <div class="stat-label">Signature Dishes</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">100K+</span>
-                <div class="stat-label">Happy Customers</div>
-            </div>
-        </div>
-
-        <section class="about">
-            <h2>About Us</h2>
-            <p>We offer a curated selection of gourmet dishes in a cozy, elegant setting. Whether you're celebrating a special occasion or just enjoying a night out, we're here to make it memorable. Our master chefs combine traditional techniques with modern innovation to create extraordinary dining experiences that will delight your senses and create lasting memories.</p>
-        </section>
+        {% endfor %}
     </div>
-
-    <script>
-        // Add some interactive effects
-        document.addEventListener('DOMContentLoaded', function() {
-            // Smooth hover effect for buttons
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(button => {
-                button.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-3px) scale(1.02)';
-                });
-                
-                button.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0) scale(1)';
-                });
-            });
-
-            // Add click effect
-            buttons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    // Create ripple effect
-                    const ripple = document.createElement('span');
-                    const rect = this.getBoundingClientRect();
-                    const size = Math.max(rect.width, rect.height);
-                    const x = e.clientX - rect.left - size / 2;
-                    const y = e.clientY - rect.top - size / 2;
-                    
-                    ripple.style.cssText = `
-                        position: absolute;
-                        width: ${size}px;
-                        height: ${size}px;
-                        left: ${x}px;
-                        top: ${y}px;
-                        background: rgba(255,255,255,0.3);
-                        border-radius: 50%;
-                        transform: scale(0);
-                        animation: ripple 0.6s ease-out;
-                        pointer-events: none;
-                    `;
-                    
-                    this.appendChild(ripple);
-                    setTimeout(() => ripple.remove(), 600);
-                });
-            });
-        });
-
-        // Add ripple animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(2);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
-</body>
-</html>
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-utensils fa-5x text-muted mb-3"></i>
+        <h3>No restaurants available yet</h3>
+        <p class="text-muted">Check back soon for amazing dining options!</p>
+        {% if session.role in ['admin', 'manager'] %}
+            <a href="{{ url_for('add_restaurant') }}" class="btn btn-primary">Add First Restaurant</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

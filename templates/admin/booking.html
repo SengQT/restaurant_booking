@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Bookings - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-calendar-alt"></i> Manage Bookings</h2>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if bookings %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Restaurant</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Guests</th>
+                            <th>Special Requests</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                            <tr>
+                                <td>{{ booking.id }}</td>
+                                <td>
+                                    <strong>{{ booking.user.username }}</strong><br>
+                                    <small class="text-muted">{{ booking.user.email }}</small>
+                                </td>
+                                <td>{{ booking.restaurant.name }}</td>
+                                <td>{{ booking.booking_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ booking.booking_time.strftime('%H:%M') }}</td>
+                                <td>{{ booking.guests }}</td>
+                                <td>
+                                    {% if booking.special_requests %}
+                                        <span class="text-truncate" style="max-width: 150px; display: inline-block;" 
+                                              title="{{ booking.special_requests }}">
+                                            {{ booking.special_requests[:50] }}{% if booking.special_requests|length > 50 %}...{% endif %}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">None</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                        {{ booking.status.title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if booking.status == 'pending' %}
+                                        <a href="{{ url_for('update_booking_status', id=booking.id, status='confirmed') }}" 
+                                           class="btn btn-sm btn-success me-1">
+                                            <i class="fas fa-check"></i> Confirm
+                                        </a>
+                                        <a href="{{ url_for('update_booking_status', id=booking.id, status='cancelled') }}" 
+                                           class="btn btn-sm btn-danger">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </a>
+                                    {% elif booking.status == 'confirmed' %}
+                                        <a href="{{ url_for('update_booking_status', id=booking.id, status='cancelled') }}" 
+                                           class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                <h4>No bookings yet</h4>
+                <p class="text-muted">Bookings will appear here once customers start making reservations.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
