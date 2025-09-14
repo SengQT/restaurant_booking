@@ -327,9 +327,3 @@ def create_app():
 if __name__ == '__main__':
     app = create_app()
     app.run(debug=True)
-
-
-# db.py (this one is correct as you have it)
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()

@@ -4,3 +4,4 @@ flask-migrate
 python-dotenv
 werkzeug
 pillow
+gunicorn
