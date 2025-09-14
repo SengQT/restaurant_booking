@@ -6,7 +6,6 @@ from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import uuid
 from functools import wraps
-from flask_moment import Moment
 
 # Import database and models
 from db import db
