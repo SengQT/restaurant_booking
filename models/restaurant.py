@@ -14,6 +14,5 @@ class Restaurant(db.Model):
     
     # Relationship with bookings
     bookings = db.relationship('Booking', backref='restaurant', lazy=True, cascade='all, delete-orphan')
-    
     def __repr__(self):
         return f'<Restaurant {self.name}>'

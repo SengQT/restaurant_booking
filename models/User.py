@@ -11,6 +11,6 @@ class User(db.Model):
     
     # Relationship with bookings
     bookings = db.relationship('Booking', backref='user', lazy=True, cascade='all, delete-orphan')
-    
+
     def __repr__(self):
         return f'<User {self.username}>'

@@ -6,46 +6,13 @@ from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import uuid
 from functools import wraps
+from flask_moment import Moment
 
 # Import database and models
 from db import db
-
-# Models (you'll need to create these files)
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), default='user')  # user, manager, admin
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationship with bookings
-    bookings = db.relationship('Booking', backref='user', lazy=True, cascade='all, delete-orphan')
-
-class Restaurant(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
-    description = db.Column(db.Text)
-    location = db.Column(db.String(200), nullable=False)
-    phone = db.Column(db.String(20))
-    email = db.Column(db.String(120))
-    capacity = db.Column(db.Integer, default=50)
-    image = db.Column(db.String(255))  # Store filename
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationship with bookings
-    bookings = db.relationship('Booking', backref='restaurant', lazy=True, cascade='all, delete-orphan')
-
-class Booking(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
-    booking_date = db.Column(db.Date, nullable=False)
-    booking_time = db.Column(db.Time, nullable=False)
-    guests = db.Column(db.Integer, nullable=False, default=2)
-    special_requests = db.Column(db.Text)
-    status = db.Column(db.String(20), default='pending')  # pending, confirmed, cancelled
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+from models.user import User
+from models.restaurant import Restaurant  
+from models.booking import Booking
 
 def create_app():
     app = Flask(__name__)
@@ -178,6 +145,12 @@ def create_app():
     @login_required
     def user_dashboard():
         user = User.query.get(session['user_id'])
+        if user is None:
+            # Invalid session (e.g., user deleted); clear session and redirect to login
+            session.clear()
+            flash('Your session is invalid. Please log in again.', 'error')
+            return redirect(url_for('login'))
+        
         bookings = Booking.query.filter_by(user_id=user.id).order_by(Booking.created_at.desc()).all()
         return render_template('user/dashboard.html', user=user, bookings=bookings)
     
@@ -301,7 +274,7 @@ def create_app():
     @admin_required
     def manage_bookings():
         bookings = Booking.query.order_by(Booking.created_at.desc()).all()
-        return render_template('admin/bookings.html', bookings=bookings)
+        return render_template('admin/booking.html', bookings=bookings)
     
     @app.route('/admin/booking/status/<int:id>/<status>')
     @admin_required

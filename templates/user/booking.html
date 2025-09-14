@@ -1,0 +1,177 @@
+{% extends "user/base.html" %}
+
+{% block title %}Book Restaurant - {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Restaurant Info Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-utensils me-2"></i>
+                        {{ restaurant.name }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Address:</strong> {{ restaurant.location }}</p>
+                            <p class="mb-2"><strong>Phone:</strong> {{ restaurant.phone }}</p>
+                            <p class="mb-2"><strong>Email:</strong> {{ restaurant.email }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Capacity:</strong> {{ restaurant.capacity }} people</p>
+                            <p class="mb-0"><strong>Description:</strong> {{ restaurant.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Form Card -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-check me-2"></i>
+                        Make a Reservation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('book_restaurant', restaurant_id=restaurant.id) }}">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="booking_date" class="form-label">Date *</label>
+                                <input type="date" class="form-control" id="booking_date" name="booking_date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="booking_time" class="form-label">Time *</label>
+                                <select class="form-control" id="booking_time" name="booking_time" required>
+                                    <option value="">Select Time</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="11:30">11:30 AM</option>
+                                    <option value="12:00">12:00 PM</option>
+                                    <option value="12:30">12:30 PM</option>
+                                    <option value="13:00">1:00 PM</option>
+                                    <option value="13:30">1:30 PM</option>
+                                    <option value="14:00">2:00 PM</option>
+                                    <option value="18:00">6:00 PM</option>
+                                    <option value="18:30">6:30 PM</option>
+                                    <option value="19:00">7:00 PM</option>
+                                    <option value="19:30">7:30 PM</option>
+                                    <option value="20:00">8:00 PM</option>
+                                    <option value="20:30">8:30 PM</option>
+                                    <option value="21:00">9:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="guests" class="form-label">Number of Guests *</label>
+                                <select class="form-control" id="guests" name="guests" required>
+                                    <option value="">Select Guests</option>
+                                    {% for i in range(1, 21) %}
+                                        <option value="{{ i }}">{{ i }} {{ 'Guest' if i == 1 else 'Guests' }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Contact Number *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       placeholder="Enter your phone number" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="special_requests" class="form-label">Special Requests</label>
+                            <textarea class="form-control" id="special_requests" name="special_requests" 
+                                      rows="3" placeholder="Any special dietary requirements, celebration details, or other requests..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the restaurant's cancellation policy and terms of service *
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('user_dashboard') }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check me-2"></i>Confirm Booking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Booking Guidelines -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Booking Guidelines
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2"><i class="fas fa-clock text-primary me-2"></i>Reservations must be made at least 2 hours in advance</li>
+                                <li class="mb-2"><i class="fas fa-calendar-times text-warning me-2"></i>Cancellations allowed up to 4 hours before booking time</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2"><i class="fas fa-users text-success me-2"></i>Tables are held for 15 minutes past reservation time</li>
+                                <li class="mb-0"><i class="fas fa-phone text-info me-2"></i>For large groups (15+), please call directly</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('booking_date');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const date = document.getElementById('booking_date').value;
+    const time = document.getElementById('booking_time').value;
+    const guests = document.getElementById('guests').value;
+    const phone = document.getElementById('phone').value;
+    const terms = document.getElementById('terms').checked;
+    
+    if (!date || !time || !guests || !phone || !terms) {
+        e.preventDefault();
+        alert('Please fill in all required fields and accept the terms.');
+        return false;
+    }
+    
+    // Check if booking is at least 2 hours from now
+    const bookingDateTime = new Date(date + ' ' + time);
+    const now = new Date();
+    const twoHoursFromNow = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+    
+    if (bookingDateTime < twoHoursFromNow) {
+        e.preventDefault();
+        alert('Reservations must be made at least 2 hours in advance.');
+        return false;
+    }
+});
+</script>
+{% endblock %}

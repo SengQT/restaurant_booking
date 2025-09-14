@@ -5,3 +5,4 @@ python-dotenv
 werkzeug
 pillow
 gunicorn
+Flask-Moment==1.0.5
