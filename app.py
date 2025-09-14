@@ -9,9 +9,7 @@ from functools import wraps
 
 # Import database and models
 from db import db
-from models.user import User
-from models.restaurant import Restaurant  
-from models.booking import Booking
+from models import User, Restaurant, Booking
 
 def create_app():
     app = Flask(__name__)
