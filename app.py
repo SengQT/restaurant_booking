@@ -9,7 +9,7 @@ from functools import wraps
 
 # Import database and models
 from db import db
-from models.user import user
+from models.user import User
 from models.restaurant import Restaurant  
 from models.booking import Booking
 
@@ -38,9 +38,9 @@ def create_app():
     with app.app_context():
         db.create_all()
         # Create default admin user if doesn't exist
-        admin = user.query.filter_by(email='admin@restaurant.com').first()
+        admin = User.query.filter_by(email='admin@restaurant.com').first()
         if not admin:
-            admin_user = user(
+            admin_user = User(
                 email='admin@restaurant.com',
                 username='admin',
                 password=generate_password_hash('admin123'),
@@ -88,15 +88,15 @@ def create_app():
             email = request.form['email']
             password = request.form['password']
             
-            user = user.query.filter_by(email=email).first()
+            found_user = User.query.filter_by(email=email).first()
             
-            if user and check_password_hash(user.password, password):
-                session['user_id'] = user.id
-                session['username'] = user.username
-                session['role'] = user.role
+            if User and check_password_hash(User.password, password):
+                session['user_id'] = User.id
+                session['username'] = User.username
+                session['role'] = User.role
                 
                 flash('Login successful!', 'success')
-                if user.role in ['admin', 'manager']:
+                if User.role in ['admin', 'manager']:
                     return redirect(url_for('admin_dashboard'))
                 else:
                     return redirect(url_for('user_dashboard'))
@@ -185,8 +185,8 @@ def create_app():
     @admin_required
     def admin_dashboard():
         restaurants = Restaurant.query.all()
-        bookings = Booking.query.order_by(Booking.created_at.desc()).all()
-        users = user.query.all()
+        bookings = created_at = db.Column(db.DateTime, default=datetime.utcnow)
+        users = User.query.all()
         return render_template('admin/dashboard.html', 
                              restaurants=restaurants, 
                              bookings=bookings, 
