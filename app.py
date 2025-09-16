@@ -5,7 +5,6 @@ from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import uuid
 from functools import wraps
-
 # Import database and models
 from db import db
 from models.user import User       # match the filename exactly
@@ -309,7 +308,7 @@ def create_app():
         return timedelta(days=days)
     
     return app
-
+app = create_app()
 if __name__ == '__main__':
-    app = create_app()
+
     app.run(debug=True)
