@@ -43,39 +43,20 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="booking_date" class="form-label">Date *</label>
-                                <input type="date" class="form-control" id="booking_date" name="booking_date" required>
+                                <input type="text" class="form-control" id="booking_date" name="booking_date" 
+                                       placeholder="dd/mm/yyyy" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="booking_time" class="form-label">Time *</label>
-                                <select class="form-control" id="booking_time" name="booking_time" required>
-                                    <option value="">Select Time</option>
-                                    <option value="11:00">11:00 AM</option>
-                                    <option value="11:30">11:30 AM</option>
-                                    <option value="12:00">12:00 PM</option>
-                                    <option value="12:30">12:30 PM</option>
-                                    <option value="13:00">1:00 PM</option>
-                                    <option value="13:30">1:30 PM</option>
-                                    <option value="14:00">2:00 PM</option>
-                                    <option value="18:00">6:00 PM</option>
-                                    <option value="18:30">6:30 PM</option>
-                                    <option value="19:00">7:00 PM</option>
-                                    <option value="19:30">7:30 PM</option>
-                                    <option value="20:00">8:00 PM</option>
-                                    <option value="20:30">8:30 PM</option>
-                                    <option value="21:00">9:00 PM</option>
-                                </select>
+                                <input type="time" class="form-control" id="booking_time" name="booking_time" required>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="guests" class="form-label">Number of Guests *</label>
-                                <select class="form-control" id="guests" name="guests" required>
-                                    <option value="">Select Guests</option>
-                                    {% for i in range(1, 21) %}
-                                        <option value="{{ i }}">{{ i }} {{ 'Guest' if i == 1 else 'Guests' }}</option>
-                                    {% endfor %}
-                                </select>
+                                <input type="number" class="form-control" id="guests" name="guests" 
+                                       min="1" max="50" placeholder="Enter number of guests" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">Contact Number *</label>
@@ -141,37 +122,50 @@
 </div>
 
 <script>
-// Set minimum date to today
+// Set minimum date = today for dd/mm/yyyy format
 document.addEventListener('DOMContentLoaded', function() {
     const dateInput = document.getElementById('booking_date');
-    const today = new Date().toISOString().split('T')[0];
-    dateInput.setAttribute('min', today);
-});
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    const formattedToday = dd + '/' + mm + '/' + yyyy;
+    dateInput.setAttribute('placeholder', formattedToday);
 
-// Form validation
-document.querySelector('form').addEventListener('submit', function(e) {
-    const date = document.getElementById('booking_date').value;
-    const time = document.getElementById('booking_time').value;
-    const guests = document.getElementById('guests').value;
-    const phone = document.getElementById('phone').value;
-    const terms = document.getElementById('terms').checked;
-    
-    if (!date || !time || !guests || !phone || !terms) {
-        e.preventDefault();
-        alert('Please fill in all required fields and accept the terms.');
-        return false;
-    }
-    
-    // Check if booking is at least 2 hours from now
-    const bookingDateTime = new Date(date + ' ' + time);
-    const now = new Date();
-    const twoHoursFromNow = new Date(now.getTime() + (2 * 60 * 60 * 1000));
-    
-    if (bookingDateTime < twoHoursFromNow) {
-        e.preventDefault();
-        alert('Reservations must be made at least 2 hours in advance.');
-        return false;
-    }
+    // Before form submit → convert dd/mm/yyyy to yyyy-mm-dd for backend
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let dateValue = dateInput.value;
+        const parts = dateValue.split('/');
+        if (parts.length === 3) {
+            const formatted = parts[2] + '-' + parts[1] + '-' + parts[0];
+            dateInput.value = formatted; // backend gets yyyy-mm-dd
+        } else {
+            e.preventDefault();
+            alert('Please enter the date in dd/mm/yyyy format.');
+        }
+
+        // Validate advance booking
+        const time = document.getElementById('booking_time').value;
+        const guests = document.getElementById('guests').value;
+        const phone = document.getElementById('phone').value;
+        const terms = document.getElementById('terms').checked;
+
+        if (!dateInput.value || !time || !guests || !phone || !terms) {
+            e.preventDefault();
+            alert('Please fill in all required fields and accept the terms.');
+            return false;
+        }
+
+        const bookingDateTime = new Date(dateInput.value + 'T' + time);
+        const now = new Date();
+        const twoHoursFromNow = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+
+        if (bookingDateTime < twoHoursFromNow) {
+            e.preventDefault();
+            alert('Reservations must be made at least 2 hours in advance.');
+            return false;
+        }
+    });
 });
 </script>
 {% endblock %}
